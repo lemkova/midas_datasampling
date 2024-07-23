@@ -1,1 +1,3 @@
 .venv/
+midas/__pycache__/
+midas/.ipynb_checkpoints/
