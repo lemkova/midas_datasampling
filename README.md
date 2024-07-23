@@ -1,3 +1,8 @@
+
+# Midas_datasampling Repo
+
+This repository is a forked version of [https://github.com/sapphire921/midas_pro](https://github.com/sapphire921/midas_pro). Although it still uses a function that is "soon to be deprecated", I have fixed the original version to replace the "already deprecated" function so that it works with the recent version of pandas.
+
 # midas_pro
 Python version of Mixed Data Sampling (MIDAS) regression (allow for multivariate MIDAS)
 

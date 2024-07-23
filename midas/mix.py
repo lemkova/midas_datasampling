@@ -51,7 +51,11 @@ def mix_freq(lf_data, hf_data, xlag, ylag, horizon, start_date=None, end_date=No
     x_rows = []
 
     for lfdate in lf_data.loc[start_date:max_date].index:
-        start_hf = hf_data.index.get_loc(lfdate, method='bfill')  # @todo Find a more efficient way
+        mask = hf_data.index >= lfdate
+        if mask.any():
+            start_hf = mask.argmax()
+        else:
+            start_hf = len(hf_data.index)
         x_rows.append(hf_data.iloc[start_hf - horizon: start_hf - xlag - horizon: -1].values)
 
     x = pd.DataFrame(data=x_rows, index=lf_data.loc[start_date:max_date].index)
@@ -64,7 +68,7 @@ def mix_freq(lf_data, hf_data, xlag, ylag, horizon, start_date=None, end_date=No
             x.loc[forecast_start_date:])
 
 
-def mix_freq2(lf_data, hf_data1,hf_data2, x1lag, x2lag, ylag, horizon, start_date=None, end_date=None):
+def mix_freq2(lf_data: pd.Series, hf_data1: pd.Series, hf_data2: pd.Series, x1lag, x2lag, ylag, horizon, start_date=None, end_date=None):
     """
     Set up data for mixed-frequency regression
 
@@ -116,8 +120,16 @@ def mix_freq2(lf_data, hf_data1,hf_data2, x1lag, x2lag, ylag, horizon, start_dat
     x2_rows = []
 
     for lfdate in lf_data.loc[start_date:max_date].index:
-        start_hf1 = hf_data1.index.get_loc(lfdate, method='bfill')  # @todo Find a more efficient way
-        start_hf2 = hf_data2.index.get_loc(lfdate, method='bfill')
+        mask1 = hf_data1.index >= lfdate
+        if mask1.any():
+            start_hf1 = mask1.argmax()
+        else:
+            start_hf1 = len(hf_data.index)
+        mask2 = hf_data2.index >= lfdate
+        if mask2.any():
+            start_hf2 = mask2.argmax()
+        else:
+            start_hf2 = len(hf_data.index)
         x1_rows.append(hf_data1.iloc[start_hf1 - horizon: start_hf1 - x1lag - horizon: -1].values)
         x2_rows.append(hf_data2.iloc[start_hf2 - horizon: start_hf2 - x2lag - horizon: -1].values)
 
@@ -179,7 +191,7 @@ def parse_lag_string(lag_string, freq):
         'a': {'y': 1}
     }
 
-    m = re.match('(\d+)(\w)', lag_string)
+    m = re.match('(\\d+)(\\w)', lag_string)
 
     duration = int(m.group(1))
     period = m.group(2).lower()
